@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import './App.css'
 
+// Get API URL from environment variables
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
 function App() {
   const [currentStep, setCurrentStep] = useState('upload') // upload, searching, results
   const [uploadedImage, setUploadedImage] = useState(null)
@@ -75,7 +78,7 @@ function App() {
     formData.append('threshold', '0.6')
 
     try {
-      const response = await fetch('http://localhost:5000/search', {
+      const response = await fetch(`${API_URL}/search`, {
         method: 'POST',
         body: formData
       })
@@ -166,7 +169,7 @@ function App() {
       setDownloadProgress({ current: selectedImages.size, total: selectedImages.size })
       
       // Download as ZIP
-      const response = await fetch('http://localhost:5000/download-all', {
+      const response = await fetch('${API_URL}/download-all', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -242,7 +245,7 @@ function App() {
     if (newIndex >= 0 && newIndex < searchResults.length) {
       const filename = searchResults[newIndex].image_path.split('\\').pop()
       const relativePath = searchResults[newIndex].image_path.split('photos\\')[1] || searchResults[newIndex].image_path.split('photos/')[1]
-      const imageUrl = `http://localhost:5000/images/${relativePath}`
+      const imageUrl = `${API_URL}/images/${relativePath}`
       
       setIsModalLoading(true)
       
@@ -328,7 +331,7 @@ function App() {
       setDownloadProgress({ current: searchResults.length, total: searchResults.length })
       
       // Download as ZIP
-      const response = await fetch('http://localhost:5000/download-all', {
+      const response = await fetch('${API_URL}/download-all', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -385,7 +388,7 @@ function App() {
         .slice(startIndex, startIndex + count)
         .map(result => {
           const relativePath = result.image_path.split('photos\\')[1] || result.image_path.split('photos/')[1]
-          return `http://localhost:5000/images/${relativePath}`
+          return `${API_URL}/images/${relativePath}`
         })
       
       // Preload images in background
@@ -423,7 +426,7 @@ function App() {
       if (nextIndex < searchResults.length) {
         const result = searchResults[nextIndex]
         const relativePath = result.image_path.split('photos\\')[1] || result.image_path.split('photos/')[1]
-        imagesToPreload.push(`http://localhost:5000/images/${relativePath}`)
+        imagesToPreload.push(`${API_URL}/images/${relativePath}`)
       }
     }
     
@@ -433,7 +436,7 @@ function App() {
       if (prevIndex >= 0) {
         const result = searchResults[prevIndex]
         const relativePath = result.image_path.split('photos\\')[1] || result.image_path.split('photos/')[1]
-        imagesToPreload.push(`http://localhost:5000/images/${relativePath}`)
+        imagesToPreload.push(`${API_URL}/images/${relativePath}`)
       }
     }
     
@@ -646,7 +649,7 @@ function App() {
                   
                   // Extract relative path from full path
                   const relativePath = result.image_path.split('photos\\')[1] || result.image_path.split('photos/')[1];
-                  const imageUrl = `http://localhost:5000/images/${relativePath}`;
+                  const imageUrl = `${API_URL}/images/${relativePath}`;
                   
                   return (
                     <div key={index} className={`photo-item ${isSelectionMode ? 'selection-mode' : ''} ${selectedImages.has(index) ? 'selected' : ''}`}>
