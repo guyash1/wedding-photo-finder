@@ -1,0 +1,12 @@
+[phases.setup]
+aptPkgs = ["libgl1", "libglib2.0-0", "libsm6", "libxext6", "libxrender1"]
+nixPkgs = ["python39", "pip"]
+
+[phases.install]
+cmds = ["cd backend && pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["echo 'Build complete'"]
+
+[start]
+cmd = "cd backend && python api.py"
