@@ -527,15 +527,8 @@ function App() {
               </label>
             </div>
             
-            <div className="upload-options">
-              <button 
-                onClick={handleCameraCapture}
-                className="camera-btn"
-                disabled={isLoading}
-              >
-                📸 צלם עכשיו
-              </button>
-              {uploadedImage && (
+            {uploadedImage && (
+              <div className="upload-options">
                 <button 
                   onClick={handleImageReplace}
                   className="replace-btn"
@@ -543,8 +536,8 @@ function App() {
                 >
                   🔄 החלף תמונה
                 </button>
-              )}
-            </div>
+              </div>
+            )}
             
             {uploadedImage && (
               <button onClick={handleSearch} className="search-btn">
@@ -581,47 +574,6 @@ function App() {
                                 <h2>נמצאו {searchResults.length} תמונות!</h2>
                             </div>
                             <div className="header-buttons">
-                                {!isSelectionMode ? (
-                                    <>
-                                        <button 
-                                            onClick={toggleSelectionMode}
-                                            className="select-mode-btn"
-                                        >
-                                            ☑️ בחר תמונות
-                                        </button>
-                                        <button 
-                                            onClick={downloadAllImages} 
-                                            className="download-all-btn"
-                                            disabled={isLoading}
-                                        >
-                                            {isLoading ? (
-                                                downloadProgress ? 
-                                                    `📦 יוצר ZIP... ${downloadProgress.current}/${downloadProgress.total}` :
-                                                    '📦 יוצר ZIP...'
-                                            ) : '📦 הורד הכל כ-ZIP'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button 
-                                            onClick={downloadSelectedImages}
-                                            className="download-selected-btn"
-                                            disabled={isLoading || selectedImages.size === 0}
-                                        >
-                                            {isLoading ? (
-                                                downloadProgress ? 
-                                                    `📦 יוצר ZIP... ${downloadProgress.current}/${downloadProgress.total}` :
-                                                    '📦 יוצר ZIP...'
-                                            ) : `📦 הורד נבחרות (${selectedImages.size})`}
-                                        </button>
-                                        <button 
-                                            onClick={toggleSelectionMode}
-                                            className="cancel-selection-btn"
-                                        >
-                                            ❌ ביטול בחירה
-                                        </button>
-                                    </>
-                                )}
                                 <button onClick={resetSearch} className="new-search-btn">
                                     🔄 חיפוש חדש
                                 </button>
@@ -652,23 +604,13 @@ function App() {
                   const imageUrl = `${API_URL}/images/${relativePath}`;
                   
                   return (
-                    <div key={index} className={`photo-item ${isSelectionMode ? 'selection-mode' : ''} ${selectedImages.has(index) ? 'selected' : ''}`}>
+                    <div key={index} className="photo-item">
                       <div className="photo-container">
-                        {isSelectionMode && (
-                          <div className="selection-checkbox">
-                            <input
-                              type="checkbox"
-                              checked={selectedImages.has(index)}
-                              onChange={() => toggleImageSelection(index)}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          </div>
-                        )}
                         <img 
                           src={imageUrl}
                           alt={`תמונה ${number}`}
                           loading="lazy"
-                          onClick={() => isSelectionMode ? toggleImageSelection(index) : openImageModal(imageUrl, index)}
+                          onClick={() => openImageModal(imageUrl, index)}
                           onLoad={(e) => {
                             // Mark image as loaded for smooth transitions
                             e.target.style.opacity = '1'
@@ -681,38 +623,32 @@ function App() {
                             transition: 'opacity 0.3s ease'
                           }}
                         />
-                        {!isSelectionMode && (
-                          <>
-                            <button 
-                              className="download-single-btn"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                downloadImage(imageUrl, filename)
-                              }}
-                              title="הורד תמונה"
-                            >
-                              ⬇️
-                            </button>
-                            <button 
-                              className={`favorite-btn ${isFavorite(imageUrl) ? 'favorited' : ''}`}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                toggleFavorite(imageUrl)
-                              }}
-                              title={isFavorite(imageUrl) ? 'הסר ממועדפים' : 'הוסף למועדפים'}
-                            >
-                              {isFavorite(imageUrl) ? '❤️' : '🤍'}
-                            </button>
-                          </>
-                        )}
+                        <button 
+                          className="download-single-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            downloadImage(imageUrl, filename)
+                          }}
+                          title="הורד תמונה"
+                        >
+                          ⬇️
+                        </button>
+                        <button 
+                          className={`favorite-btn ${isFavorite(imageUrl) ? 'favorited' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleFavorite(imageUrl)
+                          }}
+                          title={isFavorite(imageUrl) ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+                        >
+                          {isFavorite(imageUrl) ? '❤️' : '🤍'}
+                        </button>
                       </div>
                       <div className="photo-info">
                         <p className="photo-number">תמונה #{number}</p>
                         <p className="photo-counter">{index + 1} מתוך {searchResults.length}</p>
                         <p className="similarity">{(result.similarity * 100).toFixed(1)}% התאמה</p>
-                        <p className="click-hint">
-                          {isSelectionMode ? 'לחץ לבחירה' : 'לחץ להגדלה'}
-                        </p>
+                        <p className="click-hint">לחץ להגדלה</p>
                       </div>
                     </div>
                   );
