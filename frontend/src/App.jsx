@@ -31,6 +31,9 @@ function App() {
   
   // Favorites system
   const [favoriteImages, setFavoriteImages] = useState(new Set())
+  
+  // Scroll to top button
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0]
@@ -233,6 +236,34 @@ function App() {
     } catch (error) {
       setSelectedImage(imageUrl) // Fallback to original URL
       setIsModalLoading(false)
+    }
+  }
+  
+  // Touch/swipe handling for modal
+  const [touchStart, setTouchStart] = React.useState(null)
+  const [touchEnd, setTouchEnd] = React.useState(null)
+
+  const handleTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+    
+    if (isLeftSwipe && selectedImageIndex < searchResults.length - 1) {
+      navigateImage(1) // Next image
+    }
+    if (isRightSwipe && selectedImageIndex > 0) {
+      navigateImage(-1) // Previous image
     }
   }
 
@@ -494,6 +525,17 @@ function App() {
     if (scrollPercent > 0.8 && visibleCount < searchResults.length) {
       preloadNextImages(visibleCount, 10)
     }
+    
+    // Show/hide scroll to top button
+    setShowScrollTop(scrollTop > 300)
+  }
+  
+  // Scroll to top function
+  const scrollToTop = () => {
+    const photoGrid = document.querySelector('.photo-grid')
+    if (photoGrid) {
+      photoGrid.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   // Memory cleanup function
@@ -719,7 +761,12 @@ function App() {
               <button className="close-btn" onClick={closeImageModal}>❌</button>
             </div>
             
-            <div className="modal-image-container">
+            <div 
+              className="modal-image-container"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               <button 
                 className="nav-btn prev-btn" 
                 onClick={() => navigateImage(-1)}
@@ -773,6 +820,17 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Scroll to top button */}
+      {currentStep === 'results' && showScrollTop && (
+        <button 
+          className="scroll-to-top-btn"
+          onClick={scrollToTop}
+          title="חזור למעלה"
+        >
+          ⬆️
+        </button>
       )}
       </div>
   )
