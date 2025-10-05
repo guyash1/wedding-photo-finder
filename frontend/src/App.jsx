@@ -237,6 +237,12 @@ function App() {
   }
 
   const closeImageModal = () => {
+    // Scroll to the current image in the grid before closing
+    const currentImageElement = document.querySelector(`.photo-item:nth-child(${selectedImageIndex + 1})`)
+    if (currentImageElement) {
+      currentImageElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    
     setSelectedImage(null)
   }
 
