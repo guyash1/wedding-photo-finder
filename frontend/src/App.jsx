@@ -283,17 +283,38 @@ function App() {
     }
   }
 
-  const downloadImage = (imageUrl, filename) => {
-    // Convert image URL to download URL
-    const downloadUrl = imageUrl.replace('/images/', '/download/')
-    
-    const link = document.createElement('a')
-    link.href = downloadUrl
-    link.download = filename || 'wedding-photo.jpg'
-    link.target = '_blank' // For mobile compatibility
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const downloadImage = async (imageUrl, filename) => {
+    try {
+      // Convert image URL to download URL
+      const downloadUrl = imageUrl.replace('/images/', '/download/')
+      
+      // Fetch the image
+      const response = await fetch(downloadUrl)
+      const blob = await response.blob()
+      
+      // Create a download link with blob URL
+      const blobUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename || 'wedding-photo.jpg'
+      // Don't use target='_blank' - it opens a new tab
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // Clean up blob URL
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100)
+    } catch (error) {
+      console.error('Error downloading image:', error)
+      // Fallback to simple download
+      const downloadUrl = imageUrl.replace('/images/', '/download/')
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename || 'wedding-photo.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 
   // Toggle favorite status for an image
